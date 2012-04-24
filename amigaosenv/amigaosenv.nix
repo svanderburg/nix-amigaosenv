@@ -31,9 +31,9 @@ stdenv.mkDerivation {
     
     cd GG
     
-    for i in `find . -type d` `find . -type f`
+    (find . -type d; find . -type f) | while read i
     do
-        chmod 755 $i
+        chmod 755 "$i"
     done
     
     # Install build inputs
@@ -41,6 +41,12 @@ stdenv.mkDerivation {
     for i in ${toString buildInputs}
     do
         cp -av $i/* .
+        
+        # Fix permissions
+        (find . -type d; find . -type f) | while read j
+        do
+            chmod 755 "$j"
+        done
     done
     
     cd ..
@@ -75,7 +81,7 @@ stdenv.mkDerivation {
       else
           echo "failure" > /OUT/done
       fi
-    ) 2>&1 | tee /OUT/log.txt
+    ) 2>&1 | tee /OUT/.log.txt
     EOF
     
     cd ../..
@@ -109,13 +115,13 @@ stdenv.mkDerivation {
     uae &
     
     # Wait until the build starts generating output
-    while [ ! -f $out/log.txt ]
+    while [ ! -f $out/.log.txt ]
     do
         sleep 1
     done
     
     # Try to display some of the output while the build is running
-    tail -f $out/log.txt &
+    tail -f $out/.log.txt &
     
     # Wait until the build indicates that it has finished
     while [ ! -f $out/done ]
