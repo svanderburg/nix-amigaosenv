@@ -1,10 +1,10 @@
-{stdenv, uae, procps, amigaDiskImage, kickstartROMFile}:
+{stdenv, uae, lndir, procps, amigaDiskImage, kickstartROMFile}:
 {name, src, buildCommand, buildInputs ? []}:
 
 stdenv.mkDerivation {
   inherit name;
   
-  buildInputs = [ uae procps ];
+  buildInputs = [ uae lndir procps ];
   
   buildCommand = ''
     # Create virtual harddisk
@@ -24,29 +24,17 @@ stdenv.mkDerivation {
         fi
     done
 
-    # Copy the geek gadgets environment and fix permissions
+    # Symlink the geek gadgets environment
     
-    cp -av ${amigaDiskImage}/GG .
-    chmod 755 GG
-    
+    mkdir GG
     cd GG
+    lndir ${amigaDiskImage}/GG
     
-    (find . -type d; find . -type f) | while read i
-    do
-        chmod 755 "$i"
-    done
-    
-    # Install build inputs
+    # Symlink build inputs
     
     for i in ${toString buildInputs}
     do
-        cp -av $i/* .
-        
-        # Fix permissions
-        (find . -type d; find . -type f) | while read j
-        do
-            chmod 755 "$j"
-        done
+        lndir $i
     done
     
     cd ..
