@@ -3,6 +3,7 @@ in
 rec {
   amigaosenv = import ../../amigaosenv {
     inherit (pkgs) stdenv uae procps;
+    inherit (pkgs.xorg) lndir;
   };
   
   hello = import ./hello {
