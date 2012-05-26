@@ -72,13 +72,14 @@ Workbench, the `amigaosenv/default.nix` file must be adapted:
 
 Usage
 =====
-A Nix expression that builds AmigaOS software may looks like this:
+A Nix expression that builds AmigaOS software may look like this:
 
     {amigaosenv, dependency}:
     
     amigaosenv.mkDerivation {
       name = "mypackage-0.1";
       src = /path/to/source.tar.gz; # Or perhaps function invocation to fetchurl
+      buildInputs = [ dependency ];
       
       # Package build instructions
       buildCommand = ''
