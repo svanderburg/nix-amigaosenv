@@ -11,6 +11,10 @@ rec {
     inherit (pkgs) fetchurl;
   };
   
+  print_hello = import ./print-hello {
+    inherit amigaosenv hello;
+  };
+  
   hello_intuition = import ./hello-intuition {
     inherit amigaosenv;
   };

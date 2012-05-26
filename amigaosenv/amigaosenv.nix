@@ -1,5 +1,5 @@
 {stdenv, uae, lndir, procps, amigaDiskImage, kickstartROMFile}:
-{name, src, buildCommand, buildInputs ? []}:
+{name, src ? null, buildCommand, buildInputs ? []}:
 
 stdenv.mkDerivation {
   inherit name;
@@ -44,17 +44,19 @@ stdenv.mkDerivation {
     mkdir T
     cd T
     
-    stripHash ${src}
-    cp -av ${src} $strippedName
-    
-    if [ -d "$strippedName" ]
-    then
-        chmod -R 755 "$strippedName"
-    fi
+    ${if src == null then "" else ''
+      stripHash ${src}
+      cp -av ${src} $strippedName
+      
+      if [ -d "$strippedName" ]
+      then
+          chmod -R 755 "$strippedName"
+      fi
+      
+      echo "src=$strippedName" > buildinstructions.sh
+    ''}
     
     # Create build script
-    
-    echo "src=$strippedName" > buildinstructions.sh
     
     cat >> buildinstructions.sh << "EOF"
     ${buildCommand}
