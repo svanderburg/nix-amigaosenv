@@ -102,7 +102,7 @@ stdenv.mkDerivation {
     export DISPLAY=:0
     
     # Start UAE
-    uae &
+    uae & UAE_PID=$!
     
     # Wait until the build starts generating output
     while [ ! -f $out/.log.txt ]
@@ -111,7 +111,7 @@ stdenv.mkDerivation {
     done
     
     # Try to display some of the output while the build is running
-    tail -f $out/.log.txt &
+    tail -f $out/.log.txt & TAIL_PID=$!
     
     # Wait until the build indicates that it has finished
     while [ ! -f $out/done ]
@@ -120,9 +120,9 @@ stdenv.mkDerivation {
     done
     
     # Kill the emulator and tail processes
-    pkill uae
+    kill $UAE_PID
     sleep 1
-    pkill tail
+    kill $TAIL_PID
     
     # Check the build status
     [ "$(cat $out/done)" = "success" ]
