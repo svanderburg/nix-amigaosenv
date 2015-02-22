@@ -7,7 +7,7 @@ let
   
   callPackage = pkgs.lib.callPackageWith (pkgs // pkgs.xorg // self);
   
-  self = rec {
+  self = {
     amigaosenv = callPackage ../../amigaosenv { };
     
     hello = callPackage ./hello { };
@@ -17,6 +17,6 @@ let
     hello_intuition = callPackage ./hello-intuition { };
     
     wavepak = callPackage ./wavepak { };
-};
+  };
 in
 self
