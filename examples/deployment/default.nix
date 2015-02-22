@@ -1,26 +1,22 @@
-let pkgs = import <nixpkgs> {};
+{ nixpkgs ? <nixpkgs>
+, system ? builtins.currentSystem
+}:
+
+let
+  pkgs = import nixpkgs { inherit system; };
+  
+  callPackage = pkgs.lib.callPackageWith (pkgs // pkgs.xorg // self);
+  
+  self = rec {
+    amigaosenv = callPackage ../../amigaosenv { };
+    
+    hello = callPackage ./hello { };
+    
+    print_hello = callPackage ./print-hello { };
+    
+    hello_intuition = callPackage ./hello-intuition { };
+    
+    wavepak = callPackage ./wavepak { };
+};
 in
-rec {
-  amigaosenv = import ../../amigaosenv {
-    inherit (pkgs) stdenv uae procps;
-    inherit (pkgs.xorg) lndir;
-  };
-  
-  hello = import ./hello {
-    inherit amigaosenv;
-    inherit (pkgs) fetchurl;
-  };
-  
-  print_hello = import ./print-hello {
-    inherit amigaosenv hello;
-  };
-  
-  hello_intuition = import ./hello-intuition {
-    inherit amigaosenv;
-  };
-  
-  wavepak = import ./wavepak {
-    inherit amigaosenv;
-    inherit (pkgs) fetchurl;
-  };
-}
+self

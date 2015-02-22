@@ -6,6 +6,8 @@ stdenv.mkDerivation {
   
   buildInputs = [ uae lndir procps ];
   
+  __noChroot = true;
+  
   buildCommand = ''
     # Create virtual harddisk
     mkdir hd
