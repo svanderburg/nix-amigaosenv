@@ -74,22 +74,24 @@ Usage
 =====
 A Nix expression that builds AmigaOS software may look like this:
 
-    {amigaosenv, dependency}:
-    
-    amigaosenv.mkDerivation {
-      name = "mypackage-0.1";
-      src = /path/to/source.tar.gz; # Or perhaps function invocation to fetchurl
-      buildInputs = [ dependency ];
-      
-      # Package build instructions
-      buildCommand = ''
-        tar xfvz $src
-        cd mypackage-0.1
-        ./configure --prefix=/OUT # All packages must be installed in the OUT: assignment
-        make
-        make install
-      '';
-    }
+```nix
+{amigaosenv, dependency}:
+
+amigaosenv.mkDerivation {
+  name = "mypackage-0.1";
+  src = /path/to/source.tar.gz; # Or perhaps function invocation to fetchurl
+  buildInputs = [ dependency ];
+  
+  # Package build instructions
+  buildCommand = ''
+    tar xfvz $src
+    cd mypackage-0.1
+    ./configure --prefix=/OUT # All packages must be installed in the OUT: assignment
+    make
+    make install
+  '';
+}
+```
 
 Of course, as with ordinary Nix expressions, this expression must also be
 composed by invoking it with its required function arguments. More details and
