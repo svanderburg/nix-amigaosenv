@@ -24,8 +24,10 @@ First, the Geek Gadgets toolset, system headers and the LhA archiver must be
 downloaded. These packages can be obtained by entering the `scripts` directory
 and running the following script:
 
-    $ export GG_SOURCE=~/ggdownloads # Preferred location where the downloaded packages must be stored
-    $ ./download-prerequisites.sh
+```bash
+$ export GG_SOURCE=~/ggdownloads # Preferred location where the downloaded packages must be stored
+$ ./download-prerequisites.sh
+```
 
 The resulting packages are stored in `$GG_SOURCE`. This environment variable is
 also used by the geek gadgets installation script, which we will use later.
@@ -44,10 +46,12 @@ Furhermore, as LhA is the most popular archiving format this must also be
 installed, which can be done by running the following instructions on the
 AmigaOS CLI:
 
-    > T:
-    > Protect lha.run +e
-    > lha.run
-    > Copy lha_68k C:lha
+```
+> T:
+> Protect lha.run +e
+> lha.run
+> Copy lha_68k C:lha
+```
 
 These instructions provide an `lha` executable in the `C:` assignment containing
 executables.
@@ -59,16 +63,45 @@ must be installed. Furthermore, a few adaptions to the Workbench must be made so
 that the Geek Gadgets utilities can be properly used and build instructions can
 be automated:
 
-    $ export AMIGABASE=~/amigabase # Directory where the AmigaOS filesystem is stored containing the Workbench installation
-    $ ./install-geekgadgets.sh
+```bash
+$ export AMIGABASE=~/amigabase # Directory where the AmigaOS filesystem is stored containing the Workbench installation
+$ ./install-geekgadgets.sh
+```
 
 Configuring the Nix build function
 ----------------------------------
 In order to let the Nix function find the Amiga Kickstart ROM and the Amiga
 Workbench, the `amigaosenv/default.nix` file must be adapted:
 
-    kickstartROMFile = /path/to/the/kickstart/kick.rom; # Location of the kick.rom file, which UAE uses
-    amigaDiskImage = /path/to/amigabase; # Location to the Amiga Workbench installation containing Geek Gadgets
+```nix
+kickstartROMFile = /path/to/the/kickstart/kick.rom; # Location of the kick.rom file, which UAE uses
+amigaDiskImage = /path/to/amigabase; # Location to the Amiga Workbench installation containing Geek Gadgets
+```
+
+Relaxing Nix's purity restrictions
+----------------------------------
+To make the Nix builds work, we must "cheat" a bit by breaking Nix's purity
+facilities. First, ensure that the sandboxing setting has been disabled or set
+to `relaxed`, by editing the `/etc/nix/nix.conf` file add adding the following
+property:
+
+```
+build-use-sandbox = relaxed
+```
+
+in NixOS, we can relax the sandboxing settings with the following configuration
+property:
+
+```nix
+nix.useSandbox = "relaxed";
+```
+
+Finally, we must ensure that external processes can connect to an X server. Use
+`xhost` to authorize any process to connect:
+
+```bash
+$ xhost +
+```
 
 Usage
 =====
@@ -99,7 +132,6 @@ some concrete examples can be found in the `examples/` directory.
 
 Examples
 ========
-
 This package includes several example cases:
 
 * GNU Hello, the trivial example case from the GNU project
@@ -110,4 +142,6 @@ The top-level expression of these examples can be found in
 `examples/deployment/default.nix` in this package. For example, GNU Hello can be
 built by opening the `examples/deployment` directory and by running:
 
-    $ nix-build -A hello
+```bash
+$ nix-build -A hello
+```
