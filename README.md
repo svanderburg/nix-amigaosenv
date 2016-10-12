@@ -4,8 +4,8 @@ This package contains a function for the
 [Nix package manager](http://nixos.org/nix) that automatically builds AmigaOS
 software packages using [Geek Gadgets](http://geekgadgets.back2roots.org), a GNU
 build tool chain ported to AmigaOS, and an Amiga emulator (either the
-["vanilla" UAE](http://www.amigaemulator.org) or
-[FS-UAE](https://fs-uae.net).
+["vanilla" UAE](http://amiga.technology) or
+[FS-UAE](https://fs-uae.net)).
 
 With this Nix function, one can easily build software for AmigaOS (e.g. for
 porting) the same way as ordinary packages are built by using the Nix package
