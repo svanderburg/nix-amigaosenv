@@ -1,10 +1,53 @@
-{stdenv, uae, lndir, procps, amigaDiskImage, kickstartROMFile}:
+{stdenv, uae, fsuae, lndir, procps, amigaDiskImage, kickstartROMFile, amigaModel ? "A4000/040", useUAE}:
 {name, src ? null, buildCommand, buildInputs ? []}:
 
+let
+  generateEmulatorConfig = if useUAE then ''
+    cat > .uaerc <<EOF
+    config_description=UAE default configuration
+    use_gui=no
+    kickstart_rom_file=${kickstartROMFile}
+    sound_output=none
+    fastmem_size=8
+    chipmem_size=4
+    cpu_speed=max
+    cpu_type=68ec020
+    gfx_linemode_windowed=double
+    filesystem2=rw,:HD0:$(pwd)/hd,1
+    filesystem=rw,HD0:$(pwd)/hd
+    filesystem2=rw,:OUT:$out,0
+    filesystem=rw,OUT:$out
+    EOF
+  ''
+  else
+  ''
+    cat > config.fs-uae <<EOF
+    hard_drive_0 = $(pwd)/hd
+    hard_drive_0_label = HD0
+    hard_drive_1 = $out
+    hard_drive_1_label = OUT
+    kickstart_file = ${kickstartROMFile}
+    amiga_model = ${amigaModel}
+    uae_fastmem_size = 8
+    uae_sound_output = none
+    automatic_input_grab = 0
+    EOF
+  '';
+  
+  startUae = if useUAE then "uae & UAE_PID=$!" else "fs-uae ./config.fs-uae & UAE_PID=$!";
+  
+  cpOrLn = path: if useUAE then ''ln -s "${path}"'' else ''cp -rv "${path}" .'';
+  
+  cpOrLndir = path: if useUAE then ''lndir "${path}"'' else
+    ''
+      cp -rv "${path}"/* .
+      chmod -R u+w .
+    '';
+in
 stdenv.mkDerivation {
   inherit name;
   
-  buildInputs = [ uae lndir procps ];
+  buildInputs = [ procps ] ++ (if useUAE then [ uae lndir ] else [ fsuae ]);
   
   __noChroot = true;
   
@@ -17,12 +60,12 @@ stdenv.mkDerivation {
     
     for i in ${amigaDiskImage}/{C,Classes,Expansion,Fonts,L,Libs,Locale,Prefs,Rexxc,S,Storage,System,Tools,Utilities,WBStartup}
     do
-        ln -s "$i"
+        ${cpOrLn "$i"}
     
         # Symlink icons
         if [ -f "$i.info" ]
         then
-            ln -sf "$i.info"
+            ${cpOrLn "$i.info"}
         fi
     done
 
@@ -30,13 +73,13 @@ stdenv.mkDerivation {
     
     mkdir GG
     cd GG
-    lndir ${amigaDiskImage}/GG
+    ${cpOrLndir "${amigaDiskImage}/GG"}
     
     # Symlink build inputs
     
     for i in ${toString buildInputs}
     do
-        lndir $i
+        ${cpOrLndir "$i"}
     done
     
     cd ..
@@ -48,7 +91,7 @@ stdenv.mkDerivation {
     
     ${if src == null then "" else ''
       stripHash ${src}
-      cp -av ${src} $strippedName
+      cp -rv ${src} $strippedName
       
       if [ -d "$strippedName" ]
       then
@@ -78,33 +121,21 @@ stdenv.mkDerivation {
     
     cd ../..
     
+    chmod -R u+w hd
+    
     # Create output directory
     mkdir -p $out
     
     # Create UAE config file
     export HOME=$(pwd)
     
-    cat > .uaerc <<EOF
-    config_description=UAE default configuration
-    use_gui=no
-    kickstart_rom_file=${kickstartROMFile}
-    sound_output=none
-    fastmem_size=8
-    chipmem_size=4
-    cpu_speed=max
-    cpu_type=68ec020
-    gfx_linemode_windowed=double
-    filesystem2=rw,:HD0:$(pwd)/hd,1
-    filesystem=rw,HD0:$(pwd)/hd
-    filesystem2=rw,:OUT:$out,0
-    filesystem=rw,OUT:$out
-    EOF
+    ${generateEmulatorConfig}
     
     # We require a X11 display (Yes, I know it's impure)
     export DISPLAY=:0
     
     # Start UAE
-    uae & UAE_PID=$!
+    ${startUae}
     
     # Wait until the build starts generating output
     while [ ! -f $out/.log.txt ]

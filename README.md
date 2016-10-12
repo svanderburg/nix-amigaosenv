@@ -3,12 +3,13 @@ Nix AmigaOS environment
 This package contains a function for the
 [Nix package manager](http://nixos.org/nix) that automatically builds AmigaOS
 software packages using [Geek Gadgets](http://geekgadgets.back2roots.org), a GNU
-build tool chain ported to AmigaOS, and UAE, the
-[Ultimate Amiga Emulator](http://www.amigaemulator.org).
+build tool chain ported to AmigaOS, and an Amiga emulator (either the
+["vanilla" UAE](http://www.amigaemulator.org) or
+[FS-UAE](https://fs-uae.net).
 
-By using this Nix function, one can easily build software for AmigaOS (e.g. for
+With this Nix function, one can easily build software for AmigaOS (e.g. for
 porting) the same way as ordinary packages are built by using the Nix package
-manager.
+manager for modern platforms such as Linux.
 
 Furthermore, this package includes several example cases demonstrating its use.
 
@@ -144,4 +145,13 @@ built by opening the `examples/deployment` directory and by running:
 
 ```bash
 $ nix-build -A hello
+```
+
+By default, the AmigaOS build function uses the vanilla UAE to execute builds.
+Alternatively, FS-UAE, a more advanced and newer version of UAE can be used. Its
+only drawback compared to the vanilla UAE is that it carries out builds much
+slower.
+
+```bash
+$ nix-build --arg useUAE false -A hello
 ```

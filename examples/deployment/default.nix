@@ -1,5 +1,6 @@
 { nixpkgs ? <nixpkgs>
 , system ? builtins.currentSystem
+, useUAE ? true
 }:
 
 let
@@ -8,7 +9,9 @@ let
   callPackage = pkgs.lib.callPackageWith (pkgs // pkgs.xorg // self);
   
   self = {
-    amigaosenv = callPackage ../../amigaosenv { };
+    amigaosenv = callPackage ../../amigaosenv {
+      inherit useUAE;
+    };
     
     hello = callPackage ./hello { };
     
