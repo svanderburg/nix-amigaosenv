@@ -1,7 +1,11 @@
-{stdenv, uae, fsuae, lndir, procps, amigaDiskImage, kickstartROMFile, amigaModel ? "A4000/040", useUAE}:
-{name, src ? null, buildCommand, buildInputs ? []}:
+{stdenv, uae, fsuae, lndir, procps, mkGGEnabledDiskImage}:
+{name, src ? null, buildCommand, buildInputs ? [], kickstartROMFile, baseDiskImage, amigaModel ? "A4000/040", useUAE}:
 
 let
+  diskImage = mkGGEnabledDiskImage {
+    inherit baseDiskImage;
+  };
+  
   generateEmulatorConfig = if useUAE then ''
     cat > .uaerc <<EOF
     config_description=UAE default configuration
@@ -31,6 +35,7 @@ let
     uae_fastmem_size = 8
     uae_sound_output = none
     automatic_input_grab = 0
+    uae_cpu_speed = max
     EOF
   '';
   
@@ -58,7 +63,7 @@ stdenv.mkDerivation {
     
     # Symlink AmigaOS stuff
     
-    for i in ${amigaDiskImage}/{C,Classes,Expansion,Fonts,L,Libs,Locale,Prefs,Rexxc,S,Storage,System,Tools,Utilities,WBStartup}
+    for i in ${diskImage}/{C,Classes,Expansion,Fonts,L,Libs,Locale,Prefs,Rexxc,S,Storage,System,Tools,Utilities,WBStartup}
     do
         ${cpOrLn "$i"}
     
@@ -73,7 +78,7 @@ stdenv.mkDerivation {
     
     mkdir GG
     cd GG
-    ${cpOrLndir "${amigaDiskImage}/GG"}
+    ${cpOrLndir "${diskImage}/GG"}
     
     # Symlink build inputs
     

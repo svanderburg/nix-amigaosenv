@@ -1,17 +1,21 @@
 { nixpkgs ? <nixpkgs>
 , system ? builtins.currentSystem
 , useUAE ? true
+, kickstartROMFile
+, baseDiskImage
 }:
 
 let
   pkgs = import nixpkgs { inherit system; };
   
-  callPackage = pkgs.lib.callPackageWith (pkgs // pkgs.xorg // self);
+  emulatorSettings = {
+    inherit kickstartROMFile baseDiskImage useUAE;
+  };
+  
+  callPackage = pkgs.lib.callPackageWith (pkgs // pkgs.xorg // self // emulatorSettings);
   
   self = {
-    amigaosenv = callPackage ../../amigaosenv {
-      inherit useUAE;
-    };
+    amigaosenv = callPackage ../../amigaosenv { };
     
     hello = callPackage ./hello { };
     

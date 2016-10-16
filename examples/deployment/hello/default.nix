@@ -1,4 +1,4 @@
-{amigaosenv, fetchurl}:
+{amigaosenv, fetchurl, kickstartROMFile, baseDiskImage, useUAE}:
 
 amigaosenv.mkDerivation {
   name = "hello-2.1.1";
@@ -13,4 +13,5 @@ amigaosenv.mkDerivation {
     make || true # Ignoring missing perl2man is ok
     make install || true
   '';
+  inherit kickstartROMFile baseDiskImage useUAE;
 }

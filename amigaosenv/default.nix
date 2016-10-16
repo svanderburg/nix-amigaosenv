@@ -1,14 +1,12 @@
-{stdenv, fetchurl, fsuae, uae, lndir, procps, lhasa, bchunk, cdrtools, useUAE ? true}:
+{stdenv, fetchurl, fsuae, uae, lndir, procps, lhasa, bchunk, cdrtools}:
 
 rec {
-  mkGGDiskImage = import ./diskimage.nix {
-    baseDiskImage = /home/sander/amigabaseimage;
+  mkGGEnabledDiskImage = import ./diskimage.nix {
     inherit stdenv fetchurl lhasa bchunk cdrtools;
   };
   
   mkDerivation = import ./amigaosenv.nix {
-    kickstartROMFile = /home/sander/temp/kickrom/kick.rom;
-    amigaDiskImage = mkGGDiskImage;
-    inherit stdenv fsuae uae lndir procps useUAE;
+    inherit mkGGEnabledDiskImage;
+    inherit stdenv fsuae uae lndir procps;
   };
 }

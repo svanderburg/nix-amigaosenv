@@ -1,4 +1,4 @@
-{amigaosenv, fetchurl}:
+{amigaosenv, fetchurl, kickstartROMFile, baseDiskImage, useUAE}:
 
 amigaosenv.mkDerivation {
   name = "wavepak";
@@ -14,4 +14,5 @@ amigaosenv.mkDerivation {
     mkdir /OUT/bin
     cp wavepak /OUT/bin
   '';
+  inherit kickstartROMFile baseDiskImage useUAE;
 }

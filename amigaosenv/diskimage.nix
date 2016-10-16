@@ -1,4 +1,5 @@
-{stdenv, fetchurl, lhasa, bchunk, cdrtools, baseDiskImage}:
+{stdenv, fetchurl, lhasa, bchunk, cdrtools}:
+{baseDiskImage}:
 
 # Important source of instructions: http://aminet.net/dev/gg/0README-GG.txt
 
@@ -108,6 +109,10 @@ let
       url = ftp://ftp.exotica.org.uk/mirrors/geekgadgets/amiga/m68k/snapshots/990529/bin/textutils-1.22-bin.tgz;
       sha256 = "0fnfmcz6cd3y5krjxlhhap5r5fr9xh4f94yfibs6pjad3d2cxprs";
     };
+    gawk = fetchurl {
+      url = ftp://ftp.exotica.org.uk/mirrors/geekgadgets/amiga/m68k/snapshots/990529/bin/gawk-3.0.3-bin.tgz;
+      sha256 = "0hmy79rnix74043w4npljfsi8mcdvkp7nawz1532ag4jm9ajkrym";
+    };
     lha = fetchurl {
       url = http://aminet.net/util/arc/lha.run;
       sha256 = "08d639pjq9kxas1b3m6x9fvahs7pvhhykzgilrzysgncs6qxsj6s";
@@ -172,6 +177,7 @@ stdenv.mkDerivation {
     tar xfv ${urls.tar}
     tar xfv ${urls.termcap}
     tar xfv ${urls.textutils}
+    tar xfv ${urls.gawk} # not mentioned in the README, but it is commonly used
     
     # Fix sh symlink
 

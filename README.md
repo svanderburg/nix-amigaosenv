@@ -15,75 +15,34 @@ Furthermore, this package includes several example cases demonstrating its use.
 
 Installation
 ============
-In order to use this Nix function, a basic AmigaOS installation with Geek Gadgets
-must be manually created and a few settings have to be made in order to use this
-function.
-
-Obtaining all prerequisites
----------------------------
-First, the Geek Gadgets toolset, system headers and the LhA archiver must be
-downloaded. These packages can be obtained by entering the `scripts` directory
-and running the following script:
-
-```bash
-$ export GG_SOURCE=~/ggdownloads # Preferred location where the downloaded packages must be stored
-$ ./download-prerequisites.sh
-```
-
-The resulting packages are stored in `$GG_SOURCE`. This environment variable is
-also used by the geek gadgets installation script, which we will use later.
+In order to use this Nix function, a basic Amiga Workbench installation is
+required. Furthermore, we must relax some of Nix purity restrictions.
 
 Installing the Amiga Workbench
 ------------------------------
-The next step is creating an Amiga Workbench installation, which must be done
-manually. The legal way to obtain the Amiga Kickstart ROM images as well as the
-Workbench disk images by ordering one of the [Cloanto's Amiga Forever](http://www.amigaforever.com)
-discs.
+To make this function work we require a minimal Amiga Workbench installation.
+Unfortunately, this process cannot be automated for two reasons.
 
-UAE must be instructed to mount a directory on the host filesystem as a hard
-disk device. On this hard disk device, the Amiga Workbench must be installed.
+First, the Amiga kickstart ROMs and workbench discs cannot be freely
+distributed. The legal way to obtain these files is by ordering one of the
+[Cloanto's Amiga Forever](http://www.amigaforever.com) discs.
 
-Furhermore, as LhA is the most popular archiving format this must also be
-installed, which can be done by running the following instructions on the
-AmigaOS CLI:
+The second reason is that a Workbench installation requires running an
+installation wizard.
 
-```
-> T:
-> Protect lha.run +e
-> lha.run
-> Copy lha_68k C:lha
-```
+To make this happen, UAE must be instructed to mount a directory of the host
+filesystem as a hard disk device. On this hard disk device, the Amiga Workbench
+must be installed. Consult UAE or FS-UAE's documentation for more information.
 
-These instructions provide an `lha` executable in the `C:` assignment containing
-executables.
-
-Installing Geek Gadgets
------------------------
-After installing a basic Amiga Workbench installation, the Geek Gadgets packages
-must be installed. Furthermore, a few adaptions to the Workbench must be made so
-that the Geek Gadgets utilities can be properly used and build instructions can
-be automated:
-
-```bash
-$ export AMIGABASE=~/amigabase # Directory where the AmigaOS filesystem is stored containing the Workbench installation
-$ ./install-geekgadgets.sh
-```
-
-Configuring the Nix build function
-----------------------------------
-In order to let the Nix function find the Amiga Kickstart ROM and the Amiga
-Workbench, the `amigaosenv/default.nix` file must be adapted:
-
-```nix
-kickstartROMFile = /path/to/the/kickstart/kick.rom; # Location of the kick.rom file, which UAE uses
-amigaDiskImage = /path/to/amigabase; # Location to the Amiga Workbench installation containing Geek Gadgets
-```
+The Workbench can be installed on the hard drive by simply running its
+installation wizard. No special settings are required -- a novice installation
+process suffices.
 
 Relaxing Nix's purity restrictions
 ----------------------------------
 To make the Nix builds work, we must "cheat" a bit by breaking Nix's purity
-facilities. First, ensure that the sandboxing setting has been disabled or set
-to `relaxed`, by editing the `/etc/nix/nix.conf` file add adding the following
+features. First, ensure that the sandboxing setting has been disabled or set to
+`relaxed`, by editing the `/etc/nix/nix.conf` file add adding the following
 property:
 
 ```
@@ -124,6 +83,9 @@ amigaosenv.mkDerivation {
     make
     make install
   '';
+  kickstartROMFile = /home/sander/kick.rom; # Path to the AmigaOS 3.1 Kickstart ROM file
+  baseDiskImage = /home/sander/amigabaseimage; # Path to an UAE mount containing a clean Workbench 3.1 installation
+  uaeUAE = true; # true means use the vanilla UAE, false implies using FS-UAE
 }
 ```
 
@@ -144,7 +106,10 @@ The top-level expression of these examples can be found in
 built by opening the `examples/deployment` directory and by running:
 
 ```bash
-$ nix-build -A hello
+$ nix-build \
+  --arg kickstartROMFile /home/sander/kick.rom \
+  --arg baseDiskImage /home/sander/amigabaseimage \
+  -A hello
 ```
 
 By default, the AmigaOS build function uses the vanilla UAE to execute builds.
@@ -153,5 +118,8 @@ only drawback compared to the vanilla UAE is that it carries out builds much
 slower.
 
 ```bash
-$ nix-build --arg useUAE false -A hello
+$ nix-build --arg useUAE false \
+  --arg kickstartROMFile /home/sander/kick.rom \
+  --arg baseDiskImage /home/sander/amigabaseimage \
+  -A hello
 ```

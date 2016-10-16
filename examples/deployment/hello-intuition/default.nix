@@ -1,4 +1,4 @@
-{amigaosenv}:
+{amigaosenv, kickstartROMFile, baseDiskImage, useUAE}:
 
 amigaosenv.mkDerivation {
   name = "hello-intuition";
@@ -9,4 +9,5 @@ amigaosenv.mkDerivation {
     mkdir -p /OUT/bin
     cp hello /OUT/bin
   '';
+  inherit kickstartROMFile baseDiskImage useUAE;
 }
