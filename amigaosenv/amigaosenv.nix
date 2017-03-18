@@ -95,7 +95,7 @@ stdenv.mkDerivation {
     cd T
     
     ${if src == null then "" else ''
-      stripHash ${src}
+      strippedName=$(stripHash ${src})
       cp -rv ${src} $strippedName
       
       if [ -d "$strippedName" ]
