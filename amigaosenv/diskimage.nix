@@ -115,7 +115,7 @@ let
     };
     lha = fetchurl {
       url = http://aminet.net/util/arc/lha.run;
-      sha256 = "08d639pjq9kxas1b3m6x9fvahs7pvhhykzgilrzysgncs6qxsj6s";
+      sha256 = "15r4jccfxkiwn3yikkrjlx9622fb9cxg13q5d4f3xk2g4qaybfkn";
     };
     geekgadgetsBin = fetchurl {
       url = https://archive.org/download/cdrom-geek-gadgets-1/ADE-1.bin;
@@ -129,28 +129,28 @@ let
 in
 stdenv.mkDerivation {
   name = "amigaos-disk-image";
-  
+
   buildInputs = [ lhasa bchunk cdrtools ];
-  
+
   buildCommand = ''
     # Extract lha executable for AmigaOS
     lha x ${urls.lha}
-    
+
     mkdir -p $out
     cd $out
-    
+
     # Copy files from the base image
     cp -rv ${baseDiskImage}/* .
     chmod u+w *
-    
+
     # Install lha for AmigaOS
     mv $TMPDIR/lha_68k C/lha
     chmod 755 C/lha
-    
+
     # Extract Geek Gadget packages
     mkdir -p GG
     cd GG
-    
+
     tar xfv ${urls.GG-misc}
     tar xfv ${urls.binutils}
     tar xfv ${urls.bison}
@@ -178,16 +178,16 @@ stdenv.mkDerivation {
     tar xfv ${urls.termcap}
     tar xfv ${urls.textutils}
     tar xfv ${urls.gawk} # not mentioned in the README, but it is commonly used
-    
+
     # Fix sh symlink
 
     cd bin
     rm sh
     ln -s ksh sh
     cd ..
-    
+
     # Create a User-Startup providing the GG: assignment and Geek Gadget settings
-    
+
     cd ..
 
     cat > S/User-Startup <<EOF
@@ -205,7 +205,7 @@ stdenv.mkDerivation {
       -e "s|C:LoadWB|; C:LoadWB|" \
       -e "s|EndCLI|; C:EndCLI|" \
       S/Startup-Sequence
-    
+
     # Extract os-include/ directory from the Fred Fish disk image to make it possible to use the AmigaOS APIs
     cd $TMPDIR
     bchunk ${urls.geekgadgetsBin} ${urls.geekgadgetsCue} ADE-1
@@ -214,7 +214,7 @@ stdenv.mkDerivation {
     do
         mv $i ''${i: :-2}
     done
-    
+
     mv ADE-bin/os-include $out/GG
   '';
 }
