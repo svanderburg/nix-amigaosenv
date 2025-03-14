@@ -3,7 +3,7 @@
 amigaosenv.mkDerivation {
   name = "wavepak";
   src = fetchurl {
-    url = http://aminet.net/mus/misc/wavepak.lha;
+    url = "http://aminet.net/mus/misc/wavepak.lha";
     sha256 = "1441c7h042wac5h8aw6n5hj30yai3k9mdis0a2dp77kp8sqnf2dx";
   };
   buildCommand = ''

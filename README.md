@@ -46,14 +46,14 @@ features. First, ensure that the sandboxing setting has been disabled or set to
 property:
 
 ```
-build-use-sandbox = relaxed
+sandbox = relaxed
 ```
 
 in NixOS, we can relax the sandboxing settings with the following configuration
 property:
 
 ```nix
-nix.useSandbox = "relaxed";
+nix.settings.sandbox = "relaxed";
 ```
 
 Finally, we must ensure that external processes can connect to an X server. Use
@@ -74,7 +74,7 @@ amigaosenv.mkDerivation {
   name = "mypackage-0.1";
   src = /path/to/source.tar.gz; # Or perhaps function invocation to fetchurl
   buildInputs = [ dependency ];
-  
+
   # Package build instructions
   buildCommand = ''
     tar xfvz $src
